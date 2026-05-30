@@ -1,0 +1,41 @@
+Create a premium multipage hotel website for a luxury hotel in Arusha, Tanzania called “Meru Haven Hotel”. The website must look like a top-rated international hotel website, with a safari-inspired luxury style, excellent spacing, strong photography, modern cards, smooth transitions, and a direct-booking focus.
+
+Build it with React and Tailwind CSS. Make it fully responsive for mobile, tablet, laptop, and desktop. It must be ready for GitHub and Vercel deployment.
+
+Pages required:
+1. Home
+2. Rooms & Suites
+3. Dining
+4. Experiences / Safari
+5. Gallery
+6. About
+7. Contact
+8. Booking
+
+Important requirements:
+- Use different images on different pages. Do not repeat the same image everywhere.
+- Add sticky navigation.
+- Add mobile hamburger menu.
+- Add dark and light mode.
+- Add English and Swahili language toggle.
+- Add booking search bar on homepage.
+- Add booking form page with name, phone, email, check-in, check-out, guests, room type, and message.
+- Add WhatsApp floating button.
+- Add contact form.
+- Add Google Map placeholder for Arusha, Tanzania.
+- Add testimonials, FAQ, featured rooms, restaurant section, safari experiences, and gallery.
+- Use colors: deep green, gold, cream, white, charcoal, and warm brown.
+- Make every section polished, aligned, fast, and mobile-first.
+- Use clean reusable components and organize the code professionally.
+
+Design feeling:
+Luxury safari gateway, peaceful Arusha stay, premium but warm, trusted by tourists, business travelers, families, and honeymoon guests.
+
+
+LATEST IMAGE REQUIREMENTS:
+- Create and include local website images, not only external links.
+- Add separate images for Home, Rooms, Dining, Experiences, Gallery, About, Contact, and Booking.
+- Do not repeat the same hero image on different pages.
+- Use responsive image styling with object-fit: cover, correct aspect ratios, lazy loading, and mobile optimization.
+- Make every image look premium, hotel-focused, safari-inspired, and suitable for Arusha tourism.
+- Ensure all images work offline after download and local run.

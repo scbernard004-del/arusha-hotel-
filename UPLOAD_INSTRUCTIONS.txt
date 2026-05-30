@@ -1,0 +1,26 @@
+EASY GITHUB + VERCEL UPLOAD
+
+Upload ALL files in this arusha-hotel-easy-upload folder to GitHub.
+
+You only have one folder to upload: public
+All other files are in the main/root area.
+
+Upload these:
+- public
+- main.jsx
+- styles.css
+- index.html
+- package.json
+- package-lock.json
+- README.md
+- GOOGLE_AI_STUDIO_PROMPT.txt
+
+Do NOT upload these if they appear after testing:
+- node_modules
+- dist
+
+Vercel settings:
+Framework: Vite
+Install Command: npm install
+Build Command: npm run build
+Output Directory: dist
