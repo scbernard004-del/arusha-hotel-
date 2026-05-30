@@ -1,26 +1,15 @@
-EASY GITHUB + VERCEL UPLOAD
+UPLOAD TO GITHUB:
+Upload all files in this folder.
 
-Upload ALL files in this arusha-hotel-easy-upload folder to GitHub.
+DO NOT UPLOAD:
+node_modules
+dist
 
-You only have one folder to upload: public
-All other files are in the main/root area.
-
-Upload these:
-- public
-- main.jsx
-- styles.css
-- index.html
-- package.json
-- package-lock.json
-- README.md
-- GOOGLE_AI_STUDIO_PROMPT.txt
-
-Do NOT upload these if they appear after testing:
-- node_modules
-- dist
-
-Vercel settings:
-Framework: Vite
-Install Command: npm install
+VERCEL SETTINGS:
+Framework Preset: Vite
+Install Command: npm install --no-audit --no-fund
 Build Command: npm run build
 Output Directory: dist
+
+IMPORTANT:
+Do not upload package-lock.json. This version is made without package-lock.json to avoid Vercel install errors.
