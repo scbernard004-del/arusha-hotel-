@@ -1,15 +1,13 @@
-UPLOAD TO GITHUB:
-Upload all files in this folder.
+EASY VERCEL/GITHUB UPLOAD
 
-DO NOT UPLOAD:
-node_modules
-dist
+Upload ALL files in this folder to GitHub root.
+Do NOT upload node_modules or dist.
 
-VERCEL SETTINGS:
+Vercel settings:
 Framework Preset: Vite
 Install Command: npm install --no-audit --no-fund
 Build Command: npm run build
 Output Directory: dist
+Root Directory: ./
 
-IMPORTANT:
-Do not upload package-lock.json. This version is made without package-lock.json to avoid Vercel install errors.
+If Vercel shows 404, redeploy after confirming package.json is visible in GitHub root.
