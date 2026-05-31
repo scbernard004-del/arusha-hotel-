@@ -226,7 +226,7 @@ insert into public.gallery_images (id, url, title) values
 on conflict (id) do nothing;
 
 insert into public.staff_profiles (username, role, full_name, email, phone, photo_url, active, permissions) values
-('owner','owner','Hotel Owner','owner@arushagrandsafarihotel.com','0746584214','https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&h=900&q=82',true,'{"view_reservations":true,"receive_orders":true,"create_bookings":true,"edit_room_status":true,"confirm_payments":true,"manage_content":true,"manage_workers":true}'::jsonb),
+('owner','owner','Hotel Owner','scbernard004@gmail.com','0746584214','https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&h=900&q=82',true,'{"view_reservations":true,"receive_orders":true,"create_bookings":true,"edit_room_status":true,"confirm_payments":true,"manage_content":true,"manage_workers":true}'::jsonb),
 ('worker','worker','Front Desk Worker','worker@arushagrandsafarihotel.com','0746584214','https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=900&h=900&q=82',true,'{"view_reservations":true,"receive_orders":true,"create_bookings":true,"edit_room_status":true,"confirm_payments":false}'::jsonb)
 on conflict (username) do update set
   role=excluded.role,

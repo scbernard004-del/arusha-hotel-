@@ -101,7 +101,7 @@ const initialPage = () => {
   const hash = window.location.hash.replace('#','');
   return hiddenPages.includes(hash) ? hash : 'home';
 };
-const ownerEmail = import.meta.env.VITE_OWNER_EMAIL || 'owner@arushagrandsafarihotel.com';
+const ownerEmail = import.meta.env.VITE_OWNER_EMAIL || 'scbernard004@gmail.com';
 const workerEmail = import.meta.env.VITE_WORKER_EMAIL || 'worker@arushagrandsafarihotel.com';
 const defaultStaff = {
   owner:{username:'owner', password:'1234567890', email:ownerEmail},
@@ -162,7 +162,7 @@ const defaultSettings = {
   address:{en:'Arusha City, Tanzania', sw:'Jiji la Arusha, Tanzania'},
   phone:'+255 746 584 214',
   whatsapp:'255746584214',
-  email:'reservations@arushagrandsafarihotel.co.tz',
+  email:'scbernard004@gmail.com',
   footer:{en:'Luxury hotel in Arusha for safari, business, and leisure.', sw:'Hoteli ya kifahari Arusha kwa safari, biashara na mapumziko.'},
   mapText:{en:'Google Map Placeholder\nArusha, Tanzania', sw:'Sehemu ya Ramani ya Google\nArusha, Tanzania'}
 };
@@ -296,41 +296,70 @@ function App(){
   const loginStaff=async(role,username,password)=>{
     const clean=username.trim().toLowerCase();
     const expected=defaultStaff[role];
+    const localProfile=()=> (getStoredStaffProfiles().find(x=>x.username?.toLowerCase()===clean && x.role===role) || getStoredStaffProfiles().find(x=>x.role===role) || defaultStaffProfiles.find(x=>x.role===role));
+    const enterPanel=(profile, note='')=>{
+      setStaffProfile(profile); setStaffRole(profile.role || role); localStorage.setItem('staffRole',profile.role || role);
+      setPage(`${profile.role || role}-panel`); window.location.hash=`${profile.role || role}-panel`;
+      if(note) setSyncNote(note);
+    };
+
     if(!supabaseReady){
       if(!expected || clean !== expected.username || password !== expected.password){ return {error:{message:'Wrong username or password.'}}; }
-      const profile=(getStoredStaffProfiles().find(x=>x.role===role) || defaultStaffProfiles.find(x=>x.role===role));
-      setStaffProfile(profile); setStaffRole(role); localStorage.setItem('staffRole',role); setPage(`${role}-panel`); window.location.hash=`${role}-panel`;
-      setSyncNote('Demo login active. Connect Supabase for live database and password reset emails.');
+      enterPanel(localProfile(), '');
       return {data:{role}, error:null};
     }
 
     let email = clean.includes('@') ? clean : '';
+    let lookedUpProfile = null;
     if(!email && expected && clean === expected.username) email = expected.email;
     if(!email){
       const {data:lookup,error:lookupError}=await supabase.rpc('get_staff_login_email',{p_username:clean});
-      if(lookupError || !lookup || !lookup.length) return {error:{message:'Worker not found or inactive. Ask owner to add this worker in the staff manager.'}};
-      const match = lookup.find(x=>x.role===role) || lookup[0];
-      email = match.email;
+      if(!lookupError && lookup && lookup.length){
+        const match = lookup.find(x=>x.role===role) || lookup[0];
+        email = match.email;
+      }
     }
 
+    if(!email) return {error:{message:'Worker/owner not found. Ask the owner to add this account first.'}};
     const {data,error}=await supabase.auth.signInWithPassword({email,password});
-    if(error) return {data,error};
-    const {data:profileRows}=await supabase.from('staff_profiles').select('*').limit(50);
+
+    // Friendly first-run fallback: allows the initial owner/worker passwords to enter the panel while Supabase Auth users are being created.
+    // Live saving that needs owner permissions still requires creating the matching Supabase Auth user with the same email.
+    if(error){
+      if(expected && clean === expected.username && password === expected.password){
+        enterPanel(localProfile(), '');
+        return {data:{role, fallback:true}, error:null};
+      }
+      return {data,error:{message:'Invalid login. Make sure the username/password is correct and the matching Supabase Auth user exists.'}};
+    }
+
+    const {data:profileRows}=await supabase.from('staff_profiles').select('*').limit(80);
     const profiles=(profileRows || []).map(normalizeStaff);
-    const profile=profiles.find(x=>x.email?.toLowerCase()===email.toLowerCase()) || profiles.find(x=>x.role===role);
+    const profile=profiles.find(x=>x.email?.toLowerCase()===email.toLowerCase()) || profiles.find(x=>x.username?.toLowerCase()===clean) || profiles.find(x=>x.role===role);
     if(!profile || profile.active===false){ await supabase.auth.signOut(); return {error:{message:'This staff account is inactive or not linked to a staff profile.'}}; }
-    setSession(data.session); setStaffProfile(profile); setStaffRole(profile.role); localStorage.setItem('staffRole',profile.role); setPage(`${profile.role}-panel`); window.location.hash=`${profile.role}-panel`;
+    setSession(data.session); enterPanel(profile, '');
     await loadBookings(); await loadStaffProfiles(profile.role);
     return {data,error:null};
   };
 
 
   const resetPassword=async(role,contact)=>{
-    if(!contact) return {error:{message:'Enter your Gmail/email address or phone number.'}};
-    if(!contact.includes('@')) return {error:{message:'Phone reset needs SMS provider/M-Pesa SMS gateway. Use Gmail/email reset for now.'}};
+    const raw=(contact || '').trim().toLowerCase();
     if(!supabaseReady) return {error:{message:'Connect Supabase first, then email reset links will work.'}};
+    let email='';
+    if(raw.includes('@')) email=raw;
+    else if(raw === 'owner') email=ownerEmail;
+    else if(raw === 'worker') email=workerEmail;
+    else if(raw){
+      const {data:lookup,error:lookupError}=await supabase.rpc('get_staff_login_email',{p_username:raw});
+      if(!lookupError && lookup && lookup.length){
+        const match=lookup.find(x=>x.role===role) || lookup[0];
+        email=match.email;
+      }
+    }
+    if(!email) return {error:{message:'Enter owner, worker, a staff username, or the registered Gmail/email address. Phone reset needs SMS provider later.'}};
     const redirectTo = `${window.location.origin}/#${role}-login`;
-    const {error}=await supabase.auth.resetPasswordForEmail(contact,{redirectTo});
+    const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo});
     return {error};
   };
 
@@ -364,7 +393,6 @@ function App(){
   const loginRole = page.startsWith('worker') ? 'worker' : 'owner';
   return <div className={dark?'app dark':'app'}>
     <Header page={page} go={go} open={open} setOpen={setOpen} dark={dark} setDark={setDark} lang={lang} setLang={setLang} settings={settings}/>
-    {syncNote && <div className="syncBar">{syncNote}</div>}
     <AnimatePresence mode="wait"><motion.main key={page+lang} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-12}} transition={{duration:.28}}><Page go={go} lang={lang} rooms={rooms} setRooms={updateRooms} settings={settings} setSettings={updateSettings} galleryImages={galleryImages} setGalleryImages={updateGallery} staffProfiles={staffProfiles} setStaffProfiles={updateStaffProfiles} staffProfile={staffProfile} createBooking={createBooking} supabaseReady={supabaseReady} session={session} bookings={bookings} staffRole={staffRole} loginRole={loginRole} loginStaff={loginStaff} resetPassword={resetPassword} logoutStaff={logoutStaff} confirmBooking={confirmBooking} markReceived={markReceived} reserveBooking={reserveBooking} toggleRoomStatus={toggleRoomStatus} refreshBookings={loadBookings}/></motion.main></AnimatePresence>
     <Footer go={go} lang={lang} settings={settings}/><a className="whatsapp" href={`https://wa.me/${settings.whatsapp || '255746584214'}`} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={24}/></a>
   </div>;
@@ -397,7 +425,7 @@ function StaffLogin({lang,loginRole,loginStaff,resetPassword,go}){
   const sub = loginRole==='owner' ? (lang==='sw'?'Sehemu hii haipo kwenye menu ya wateja. Ingia kubadili bei, picha, ofa na vyumba.':'This area is hidden from customer navigation. Login to edit prices, photos, offers, and rooms.') : (lang==='sw'?'Wafanyakazi wanaweza kupokea order na kutengeneza booking.':'Workers can receive orders and create bookings.');
   const doLogin=async(e)=>{e.preventDefault(); setError(''); setNotice(''); const {error}=await loginStaff(loginRole,username,password); if(error) setError(error.message);};
   const doReset=async()=>{setError(''); setNotice(''); const {error}=await resetPassword(loginRole,contact); if(error) setError(error.message); else setNotice(lang==='sw'?'Link ya kubadili password imetumwa kwenye email.':'Password reset link sent to the email address.');};
-  return <><Hero lang={lang} image={img.aboutHero} title={title} sub={sub}/><section className="section staffSection"><form className="form ownerLogin" onSubmit={doLogin}><label>{lang==='sw'?'Username':'Username'}<input value={username} onChange={e=>setUsername(e.target.value.toLowerCase())} placeholder={loginRole==='owner'?'owner':'worker'} required/></label><label>{lang==='sw'?'Password':'Password'}<input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" required/></label>{error&&<p className="formNotice error">{error}</p>}{notice&&<p className="formNotice">{notice}</p>}<button type="submit">{lang==='sw'?'Ingia':'Login'}</button><div className="resetBox"><b>{lang==='sw'?'Umesahau password?':'Forgot password?'}</b><p>{lang==='sw'?'Weka Gmail/email yako upokee link ya reset. Kutuma kwa simu kunahitaji SMS provider.':'Enter your Gmail/email to receive a reset link. Phone reset needs an SMS provider.'}</p><input value={contact} onChange={e=>setContact(e.target.value)} placeholder="example@gmail.com or phone"/><button type="button" onClick={doReset}>{lang==='sw'?'Tuma Reset Link':'Send Reset Link'}</button></div></form><div className="secretHelp"><h3>{lang==='sw'?'Viungo vya siri':'Hidden panel links'}</h3><p>{lang==='sw'?'Wateja hawazioni kwenye menu. Tumia URL hizi wewe na timu yako pekee.':'Customers do not see these in the menu. Use these URLs only for your team.'}</p><code>#owner-login</code><code>#worker-login</code></div></section></>;
+  return <><Hero lang={lang} image={img.aboutHero} title={title} sub={sub}/><section className="section staffSection"><form className="form ownerLogin" onSubmit={doLogin}><label>{lang==='sw'?'Username':'Username'}<input value={username} onChange={e=>setUsername(e.target.value.toLowerCase())} placeholder={loginRole==='owner'?'owner':'worker'} required/></label><label>{lang==='sw'?'Password':'Password'}<input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" required/></label>{error&&<p className="formNotice error">{error}</p>}{notice&&<p className="formNotice">{notice}</p>}<button type="submit">{lang==='sw'?'Ingia':'Login'}</button><div className="resetBox"><b>{lang==='sw'?'Umesahau password?':'Forgot password?'}</b><p>{lang==='sw'?'Weka owner, worker, username, au Gmail/email upokee link ya reset. Kutuma kwa simu kunahitaji SMS provider.':'Enter owner, worker, username, or Gmail/email to receive a reset link. Phone reset needs an SMS provider.'}</p><input value={contact} onChange={e=>setContact(e.target.value)} placeholder="owner, worker, username, or email"/><button type="button" onClick={doReset}>{lang==='sw'?'Tuma Reset Link':'Send Reset Link'}</button></div></form><div className="secretHelp"><h3>{lang==='sw'?'Viungo vya siri':'Hidden panel links'}</h3><p>{lang==='sw'?'Wateja hawazioni kwenye menu. Tumia URL hizi wewe na timu yako pekee.':'Customers do not see these in the menu. Use these URLs only for your team.'}</p><code>#owner-login</code><code>#worker-login</code></div></section></>;
 }
 
 function BookingList({lang,bookings,role,permissions={},confirmBooking,markReceived,reserveBooking,refreshBookings}){

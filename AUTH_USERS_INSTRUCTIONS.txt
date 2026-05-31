@@ -1,0 +1,26 @@
+OWNER / WORKER LOGIN SETUP
+
+1) Run SUPABASE_SETUP.sql in Supabase SQL Editor first.
+2) In Supabase Dashboard, open Authentication > Users > Add User.
+3) Create owner login:
+   Email: scbernard004@gmail.com
+   Password: 1234567890
+4) Create worker login:
+   Email: worker@arushagrandsafarihotel.com
+   Password: 123456789
+
+The website login page still uses:
+Owner username: owner
+Owner password: 1234567890
+
+Worker username: worker
+Worker password: 123456789
+
+Password reset:
+- Type owner, worker, a staff username, or their email.
+- Supabase will send the reset link to the email registered for that staff account.
+
+Booking email:
+- Customer booking is saved to Supabase.
+- It also opens WhatsApp to 0746584214.
+- It also opens an email draft to scbernard004@gmail.com.
