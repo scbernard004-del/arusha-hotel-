@@ -1,0 +1,21 @@
+WINDOWS INSTALL FIX
+
+1. Extract the ZIP first. Do not run npm inside the Compressed folder.
+2. Put the extracted folder somewhere simple, for example:
+   C:\Users\Administrator\Desktop\arusha-hotel
+3. Open CMD inside that folder.
+4. Run these commands:
+
+   npm config set registry https://registry.npmjs.org/
+   rmdir /s /q node_modules
+   del package-lock.json
+   npm cache clean --force
+   npm install --no-audit --no-fund
+   npm run dev
+
+5. For Vercel, upload everything except:
+   node_modules
+   dist
+   .env
+   package-lock.json
+

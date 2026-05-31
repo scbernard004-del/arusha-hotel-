@@ -1,13 +1,36 @@
-EASY VERCEL/GITHUB UPLOAD
+UPLOAD TO GITHUB ROOT
 
-Upload ALL files in this folder to GitHub root.
-Do NOT upload node_modules or dist.
+Upload these files/folders:
+- public
+- index.html
+- main.jsx
+- styles.css
+- package.json
+- vite.config.js
+- vercel.json
+- .env.production
+- SUPABASE_SETUP.sql
+- README_SUPABASE_SETUP.md
+- CONNECT_SUPABASE_EASY.txt
+- README_STAFF_WORKERS.md
+- INSTALL_FIX_WINDOWS.txt
 
-Vercel settings:
-Framework Preset: Vite
+Do NOT upload:
+- node_modules
+- dist
+- .env
+- package-lock.json
+
+VERCEL SETTINGS
+Framework: Vite
 Install Command: npm install --no-audit --no-fund
 Build Command: npm run build
 Output Directory: dist
-Root Directory: ./
 
-If Vercel shows 404, redeploy after confirming package.json is visible in GitHub root.
+AFTER UPLOAD
+1. Run SUPABASE_SETUP.sql in Supabase SQL Editor.
+2. Create Auth users:
+   owner@arushagrandsafarihotel.com / 1234567890
+   worker@arushagrandsafarihotel.com / 123456789
+3. Redeploy Vercel.
+4. Open /#owner-login or /#worker-login.

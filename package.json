@@ -1,5 +1,5 @@
 {
-  "name": "arusha-hotel-easy-upload",
+  "name": "arusha-hotel-owner-worker-supabase-panels",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,12 +9,12 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "lucide-react": "latest",
-    "framer-motion": "latest"
-  },
-  "devDependencies": {}
+    "@supabase/supabase-js": "^2.45.4",
+    "@vitejs/plugin-react": "^4.3.1",
+    "framer-motion": "^11.3.31",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.11"
+  }
 }

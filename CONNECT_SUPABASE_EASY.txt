@@ -1,0 +1,61 @@
+EASY SUPABASE CONNECTION - ARUSHA HOTEL
+
+Your project has already been added to this website:
+Project ID: nzrrxwsfyhzehvcxlxou
+Project API URL: https://nzrrxwsfyhzehvcxlxou.supabase.co
+
+IMPORTANT:
+The website includes .env.production for Vercel build.
+Still add these same values in Vercel Environment Variables for best practice:
+
+VITE_SUPABASE_URL=https://nzrrxwsfyhzehvcxlxou.supabase.co
+VITE_SUPABASE_ANON_KEY=your anon public key
+VITE_OWNER_EMAIL=owner@arushagrandsafarihotel.com
+VITE_WORKER_EMAIL=worker@arushagrandsafarihotel.com
+
+DO NOT add service_role key to frontend or GitHub.
+
+STEPS TO MAKE DATABASE WORK:
+1) Open Supabase dashboard.
+2) Open this project: nzrrxwsfyhzehvcxlxou
+3) Go to SQL Editor.
+4) Open SUPABASE_SETUP.sql from this folder.
+5) Copy all SQL and click Run.
+6) Go to Authentication > Users > Add User.
+7) Create owner:
+   Email: owner@arushagrandsafarihotel.com
+   Password: 1234567890
+8) Create worker:
+   Email: worker@arushagrandsafarihotel.com
+   Password: 123456789
+9) Copy each User ID from Supabase Auth users.
+10) In SQL Editor, add staff profiles if needed:
+
+insert into public.staff_profiles (user_id, role, username, full_name)
+values ('OWNER_USER_ID_HERE', 'owner', 'owner', 'Owner')
+on conflict (username) do update set user_id = excluded.user_id;
+
+insert into public.staff_profiles (user_id, role, username, full_name)
+values ('WORKER_USER_ID_HERE', 'worker', 'worker', 'Worker')
+on conflict (username) do update set user_id = excluded.user_id;
+
+LOGIN LINKS:
+Owner: /#owner-login
+Worker: /#worker-login
+Keyboard shortcuts:
+CTRL + ALT + O = Owner login
+CTRL + ALT + W = Worker login
+
+GITHUB UPLOAD:
+Upload all files/folders in this folder except:
+node_modules
+dist
+.env
+package-lock.json
+
+VERCEL SETTINGS:
+Framework: Vite
+Install Command: npm install --no-audit --no-fund
+Build Command: npm run build
+Output Directory: dist
+Root Directory: ./
